@@ -81,5 +81,8 @@ class _BordeArthropodo extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_BordeArthropodo oldDelegate) => true;
+  bool shouldRepaint(_BordeArthropodo oldDelegate) {
+    // Solo repintar si la caja cambió
+    return caja != oldDelegate.caja;
+  }
 }

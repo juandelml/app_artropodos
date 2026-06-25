@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'servicios/api_service.dart';
+import 'pantalla_detalle_deteccion.dart';
 
 class PantallaHistorial extends StatefulWidget {
   const PantallaHistorial({super.key});
@@ -23,14 +24,26 @@ class _PantallaHistorialState extends State<PantallaHistorial> {
     });
   }
 
+  String? _obtenerFechaIso(Map<String, dynamic> registro) {
+    final fecha = registro['fecha_hora'] ?? registro['fecha'] ?? registro['created_at'];
+    if (fecha == null) return null;
+    return fecha.toString();
+  }
+
   String _formatearFecha(String? fechaIso) {
     if (fechaIso == null) return "Fecha desconocida";
     try {
-      DateTime fecha = DateTime.parse(fechaIso).toLocal();
+      final fecha = _parsearFechaLocal(fechaIso);
       return "${fecha.day}/${fecha.month}/${fecha.year} - ${fecha.hour}:${fecha.minute.toString().padLeft(2, '0')}";
     } catch (e) {
       return fechaIso;
     }
+  }
+
+  DateTime _parsearFechaLocal(String fechaIso) {
+    final tieneZonaHoraria = RegExp(r'(Z|[+-]\d{2}:?\d{2})$').hasMatch(fechaIso);
+    final fecha = DateTime.parse(tieneZonaHoraria ? fechaIso : '${fechaIso}Z');
+    return fecha.toLocal();
   }
 
   @override
@@ -69,6 +82,7 @@ class _PantallaHistorialState extends State<PantallaHistorial> {
               final latitud = registro['latitud'];
               final longitud = registro['longitud'];
               final rutaImagenUrl = registro['imagen_url']; // Asumimos que Django envía un 'imagen_url'
+              final fechaIso = _obtenerFechaIso(registro);
               
               // Intentar obtener la clase principal (el primer artrópodo detectado)
               String clasePrincipal = 'Desconocido';
@@ -85,7 +99,7 @@ class _PantallaHistorialState extends State<PantallaHistorial> {
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: Image.network(
-                            "http://10.13.4.12:8000$rutaImagenUrl", // Asegurar ruta absoluta a Django
+                            "http://10.13.100.199:8000$rutaImagenUrl", // Asegurar ruta absoluta a Django
                             width: 60,
                             height: 60,
                             fit: BoxFit.cover,
@@ -102,7 +116,7 @@ class _PantallaHistorialState extends State<PantallaHistorial> {
                     children: [
                       const SizedBox(height: 4),
                       Text("Avistamientos en foto: $numDetecciones"),
-                      Text(_formatearFecha(registro['fecha'])), // Asumimos campo 'fecha'
+                      Text(_formatearFecha(fechaIso)),
                       if (latitud != null && longitud != null)
                         Text(
                           "📍 Ubicación guardada",
@@ -112,7 +126,13 @@ class _PantallaHistorialState extends State<PantallaHistorial> {
                   ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
-                    // TODO: A futuro aquí podemos abrir los detalles mostrando de nuevo el lienzo
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            PantallaDetalleDeteccion(registro: registro),
+                      ),
+                    );
                   },
                 ),
               );

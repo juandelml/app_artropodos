@@ -1,6 +1,7 @@
 import 'dart:io';
-import 'dart:convert';
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'servicios/api_service.dart';
@@ -52,32 +53,49 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
   final ImagePicker _picker = ImagePicker();
 
   Future<Position?> _obtenerUbicacion() async {
-    bool serviceEnabled;
-    LocationPermission permission;
+    try {
+      bool serviceEnabled;
+      LocationPermission permission;
 
-    // Verifica si los servicios de ubicación están habilitados.
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      // Los servicios de ubicación no están habilitados.
-      return null;
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        // Los permisos son denegados.
+      // Verifica si los servicios de ubicación están habilitados.
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        // Los servicios de ubicación no están habilitados.
         return null;
       }
-    }
-    
-    if (permission == LocationPermission.deniedForever) {
-      // Los permisos son denegados permanentemente.
-      return null;
-    } 
 
-    // Cuando tenemos permisos, obtenemos la ubicación.
-    return await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission().timeout(
+          const Duration(seconds: 10),
+          onTimeout: () => LocationPermission.denied,
+        );
+        if (permission == LocationPermission.denied) {
+          // Los permisos son denegados.
+          return null;
+        }
+      }
+      
+      if (permission == LocationPermission.deniedForever) {
+        // Los permisos son denegados permanentemente.
+        return null;
+      } 
+
+      // Cuando tenemos permisos, obtenemos la ubicación con timeout
+      try {
+        return await Geolocator.getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.high,
+        ).timeout(
+          const Duration(seconds: 15),
+        );
+      } on TimeoutException {
+        print("Timeout al obtener ubicación");
+        return null;
+      }
+    } catch (e) {
+      print("Error al obtener ubicación: $e");
+      return null;
+    }
   }
 
   // Función para capturar la imagen
@@ -85,17 +103,34 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     final XFile? foto = await _picker.pickImage(source: ImageSource.camera);
     
     if (foto != null) {
-      // Leemos los píxeles reales de la imagen para pasarlos al lienzo
-      final bytes = await foto.readAsBytes();
-      final image = await decodeImageFromList(bytes);
+      try {
+        // Leemos los píxeles reales de la imagen de forma asincrónica
+        final bytes = await foto.readAsBytes();
+        
+        // Decodificamos la imagen en un thread separado para no bloquear la UI
+        final image = await decodeImageFromList(bytes).timeout(
+          const Duration(seconds: 10),
+          onTimeout: () {
+            throw Exception('Timeout al procesar la imagen');
+          },
+        );
 
-      setState(() {
-        _imagenSeleccionada = File(foto.path);
-        _imgAncho = image.width.toDouble();
-        _imgAlto = image.height.toDouble();
-        _resultados = null;
-        _indicesVisibles.clear(); // Limpiamos las selecciones
-      });
+        if (mounted) {
+          setState(() {
+            _imagenSeleccionada = File(foto.path);
+            _imgAncho = image.width.toDouble();
+            _imgAlto = image.height.toDouble();
+            _resultados = null;
+            _indicesVisibles.clear(); // Limpiamos las selecciones
+          });
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error al procesar imagen: $e')),
+          );
+        }
+      }
     }
   }
 
@@ -107,29 +142,61 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
       _cargando = true;
     });
 
-    // Obtenemos la ubicación SOLO si el usuario lo marcó
-    Position? posicionLatLng;
-    if (_incluirUbicacion) {
-      posicionLatLng = await _obtenerUbicacion();
-    }
+    try {
+      print('Iniciando análisis de imagen...');
+      
+      // Obtenemos la ubicación SOLO si el usuario lo marcó
+      Position? posicionLatLng;
+      if (_incluirUbicacion) {
+        print('Obteniendo ubicación...');
+        posicionLatLng = await _obtenerUbicacion();
+        print('Ubicación obtenida: $posicionLatLng');
+      }
 
-    final respuesta = await ApiService.clasificarInsecto(
-      _imagenSeleccionada!.path,
-      latitud: posicionLatLng?.latitude,
-      longitud: posicionLatLng?.longitude,
-    );
+      print('Enviando imagen al servidor...');
+      final respuesta = await ApiService.clasificarInsecto(
+        _imagenSeleccionada!.path,
+        latitud: posicionLatLng?.latitude,
+        longitud: posicionLatLng?.longitude,
+      ).timeout(
+        const Duration(seconds: 120),
+        onTimeout: () {
+          throw Exception('Timeout: El servidor tardó demasiado en responder (>120s)');
+        },
+      );
 
-    setState(() {
-      _resultados = respuesta;
-      _cargando = false;
-      _indicesVisibles.clear();
-      // Mostramos todas las cajas por defecto
-      if (respuesta != null && respuesta['exito'] == true && respuesta['detecciones'] != null) {
-        for (int i = 0; i < (respuesta['detecciones'] as List).length; i++) {
-          _indicesVisibles.add(i);
+      print('Respuesta recibida: ${respuesta?.keys}');
+
+      if (mounted) {
+        setState(() {
+          _resultados = respuesta;
+          _cargando = false;
+          _indicesVisibles.clear();
+          // Mostramos todas las cajas por defecto
+          if (respuesta != null && respuesta['exito'] == true && respuesta['detecciones'] != null) {
+            for (int i = 0; i < (respuesta['detecciones'] as List).length; i++) {
+              _indicesVisibles.add(i);
+            }
+          }
+        });
+        
+        if (respuesta == null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Error: No se recibió respuesta del servidor')),
+          );
         }
       }
-    });
+    } catch (e) {
+      print('Error al analizar: $e');
+      if (mounted) {
+        setState(() {
+          _cargando = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error: $e')),
+        );
+      }
+    }
   }
 
   @override
@@ -157,16 +224,7 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // 1. El Lienzo con la imagen y la caja (o la imagen devuelta por el servidor)
-              if (_resultados != null && _resultados!['imagen_pintada'] != null)
-                Container(
-                  padding: const EdgeInsets.all(16.0),
-                  height: 350,
-                  child: Image.memory(
-                    base64Decode(_resultados!['imagen_pintada']),
-                    fit: BoxFit.contain,
-                  ),
-                )
-              else if (_imagenSeleccionada != null && _imgAncho != null && _imgAlto != null)
+              if (_imagenSeleccionada != null && _imgAncho != null && _imgAlto != null)
                 LienzoDeteccion(
                   imagen: _imagenSeleccionada!,
                   detecciones: _resultados != null ? _resultados!['detecciones'] : null,
