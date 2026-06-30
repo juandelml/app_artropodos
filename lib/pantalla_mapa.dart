@@ -25,7 +25,7 @@ class _PantallaMapaState extends State<PantallaMapa> {
     // IMPORTANTE: Reemplaza esta IP con tu IP local real o la de tu backend
     // Por ejemplo: 'http://192.168.1.100:8000/api/historial/'
     // Si pruebas en el emulador de Android usa 'http://10.0.2.2:8000/api/historial/'
-    final url = Uri.parse('http://10.0.2.2:8000/api/historial/');
+    final url = Uri.parse('http://192.168.1.70:8000/api/historial/');
 
     try {
       final response = await http.get(url);
@@ -79,7 +79,9 @@ class _PantallaMapaState extends State<PantallaMapa> {
                   child: Image.network(
                     // Ojo: si estás probando localhost en físico, la URL
                     // que regresa Django podría requerir ajustes.
-                    avistamiento['imagen_url'],
+                    (avistamiento['imagen_url'] as String).startsWith('http') 
+                        ? avistamiento['imagen_url'] 
+                        : "http://192.168.1.70:8000${avistamiento['imagen_url']}",
                     height: 200,
                     width: double.infinity,
                     fit: BoxFit.cover,

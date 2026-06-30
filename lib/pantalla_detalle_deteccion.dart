@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
 import 'package:http/http.dart' as http;
 import 'dart:typed_data';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 double _normalizarConfianzaValor(dynamic valor) {
   if (valor == null) return 0.0;
@@ -75,8 +77,14 @@ class _PantallaDetalleDeteccionState extends State<PantallaDetalleDeteccion> {
 
   @override
   Widget build(BuildContext context) {
-    final latitud = widget.registro['latitud'] as num?;
-    final longitud = widget.registro['longitud'] as num?;
+    double? latitud;
+    if (widget.registro['latitud'] != null) {
+      latitud = double.tryParse(widget.registro['latitud'].toString());
+    }
+    double? longitud;
+    if (widget.registro['longitud'] != null) {
+      longitud = double.tryParse(widget.registro['longitud'].toString());
+    }
     final fecha = (widget.registro['fecha_hora'] ?? widget.registro['fecha'] ?? widget.registro['created_at'])?.toString();
 
     return Scaffold(
@@ -176,8 +184,8 @@ class _PantallaDetalleDeteccionState extends State<PantallaDetalleDeteccion> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => PantallaMapaDetalle(
-                                    latitud: latitud.toDouble(),
-                                    longitud: longitud.toDouble(),
+                                    latitud: latitud!,
+                                    longitud: longitud!,
                                     detecciones: _detecciones,
                                   ),
                                 ),
@@ -480,75 +488,53 @@ class PantallaMapaDetalle extends StatelessWidget {
         title: const Text('Ubicación del Avistamiento'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
       ),
-      body: Column(
+      body: FlutterMap(
+        options: MapOptions(
+          initialCenter: LatLng(latitud, longitud),
+          initialZoom: 15.0,
+        ),
         children: [
-          Expanded(
-            child: Container(
-              color: Colors.blue.shade50,
-              child: Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Icon(
-                      Icons.location_on,
-                      size: 80,
-                      color: Colors.blue,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Coordenadas del Avistamiento',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Latitud: ${latitud.toStringAsFixed(6)}',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    Text(
-                      'Longitud: ${longitud.toStringAsFixed(6)}',
-                      style: Theme.of(context).textTheme.bodyLarge,
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        // TODO: Integrar con Google Maps o similar
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              'Mapa interactivo próximamente',
-                            ),
-                          ),
-                        );
-                      },
-                      icon: const Icon(Icons.map),
-                      label: const Text('Abrir en Aplicación de Mapas'),
-                    ),
-                  ],
+          TileLayer(
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            userAgentPackageName: 'com.tu_dominio.app_artropodos',
+          ),
+          MarkerLayer(
+            markers: [
+              Marker(
+                point: LatLng(latitud, longitud),
+                width: 50,
+                height: 50,
+                child: const Icon(
+                  Icons.location_on,
+                  color: Colors.red,
+                  size: 45,
                 ),
               ),
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: Colors.grey.shade100,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Artrópodos en esta ubicación: ${detecciones.length}',
-                  style: Theme.of(context).textTheme.titleSmall,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  detecciones
-                      .map((d) => d['clase'] ?? 'Desconocido')
-                      .join(', '),
-                  style: Theme.of(context).textTheme.bodySmall,
-                ),
-              ],
-            ),
+            ],
           ),
         ],
+      ),
+      bottomSheet: Container(
+        padding: const EdgeInsets.all(16),
+        color: Colors.white,
+        width: double.infinity,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Artrópodos en esta ubicación: ${detecciones.length}',
+              style: Theme.of(context).textTheme.titleMedium,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              detecciones
+                  .map((d) => d['clase'] ?? 'Desconocido')
+                  .join(', '),
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
+          ],
+        ),
       ),
     );
   }

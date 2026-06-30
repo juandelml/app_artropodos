@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  // Usamos la IP actual de tu Mac
-  static const String _baseUrl = 'http://10.13.100.199:8000/api/clasificar/';
-  static const String _historialUrl = 'http://10.13.100.199:8000/api/historial/';
+  // IP
+  static const String _baseUrl = 'http://192.168.1.70:8000/api/clasificar/';
+  static const String _historialUrl = 'http://192.168.1.70:8000/api/historial/';
 
   // Nueva función para obtener el historial
   static Future<List<dynamic>?> obtenerHistorial() async {

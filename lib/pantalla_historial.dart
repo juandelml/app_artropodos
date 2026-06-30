@@ -99,7 +99,7 @@ class _PantallaHistorialState extends State<PantallaHistorial> {
                       ? ClipRRect(
                           borderRadius: BorderRadius.circular(8),
                           child: Image.network(
-                            "http://10.13.100.199:8000$rutaImagenUrl", // Asegurar ruta absoluta a Django
+                            rutaImagenUrl.startsWith('http') ? rutaImagenUrl : "http://192.168.1.70:8000$rutaImagenUrl",
                             width: 60,
                             height: 60,
                             fit: BoxFit.cover,
