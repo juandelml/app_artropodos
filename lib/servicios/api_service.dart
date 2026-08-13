@@ -4,8 +4,9 @@ import 'package:http/http.dart' as http;
 
 class ApiService {
   // IP
-  static const String _baseUrl = 'http://192.168.1.70:8000/api/clasificar/';
-  static const String _historialUrl = 'http://192.168.1.70:8000/api/historial/';
+  static const String baseUrlHost = 'http://10.13.100.97:8000';
+  static const String _baseUrl = '$baseUrlHost/api/clasificar/';
+  static const String _historialUrl = '$baseUrlHost/api/historial/';
 
   // Nueva función para obtener el historial
   static Future<List<dynamic>?> obtenerHistorial() async {

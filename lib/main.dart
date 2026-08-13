@@ -7,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'servicios/api_service.dart';
 import 'lienzo_deteccion.dart';
 import 'pantalla_historial.dart';
+import 'pantalla_mapa.dart';
 
 void main() {
   runApp(const MyApp());
@@ -206,6 +207,16 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
         title: const Text('Detector de Artrópodos'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         actions: [
+          IconButton(
+            icon: const Icon(Icons.map),
+            tooltip: 'Ver Mapa',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const PantallaMapa()),
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.history),
             tooltip: 'Ver Historial',

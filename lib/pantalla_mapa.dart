@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'pantalla_detalle_deteccion.dart';
+import 'servicios/api_service.dart';
 
 class PantallaMapa extends StatefulWidget {
   const PantallaMapa({super.key});
@@ -22,17 +23,10 @@ class _PantallaMapaState extends State<PantallaMapa> {
   }
 
   Future<void> fetchUbicaciones() async {
-    // IMPORTANTE: Reemplaza esta IP con tu IP local real o la de tu backend
-    // Por ejemplo: 'http://192.168.1.100:8000/api/historial/'
-    // Si pruebas en el emulador de Android usa 'http://10.0.2.2:8000/api/historial/'
-    final url = Uri.parse('http://192.168.1.70:8000/api/historial/');
-
     try {
-      final response = await http.get(url);
+      final List<dynamic>? datos = await ApiService.obtenerHistorial();
 
-      if (response.statusCode == 200) {
-        final List<dynamic> datos = json.decode(response.body);
-
+      if (datos != null) {
         setState(() {
           // Filtramos solo los registros que tengan coordenadas válidas
           avistamientos = datos.where((item) {
@@ -42,7 +36,7 @@ class _PantallaMapaState extends State<PantallaMapa> {
         });
       } else {
         setState(() => cargando = false);
-        debugPrint('Error en la petición: ${response.statusCode}');
+        debugPrint('Error al obtener historial de la API');
       }
     } catch (e) {
       setState(() => cargando = false);
@@ -67,10 +61,23 @@ class _PantallaMapaState extends State<PantallaMapa> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
+        return InkWell(
+          onTap: () {
+            // Cerramos el BottomSheet
+            Navigator.pop(context);
+            // Navegamos a la pantalla de detalle
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    PantallaDetalleDeteccion(registro: avistamiento),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
             children: [
               // Imagen del bicho
               if (avistamiento['imagen_url'] != null)
@@ -81,7 +88,7 @@ class _PantallaMapaState extends State<PantallaMapa> {
                     // que regresa Django podría requerir ajustes.
                     (avistamiento['imagen_url'] as String).startsWith('http') 
                         ? avistamiento['imagen_url'] 
-                        : "http://192.168.1.70:8000${avistamiento['imagen_url']}",
+                        : "${ApiService.baseUrlHost}${avistamiento['imagen_url']}",
                     height: 200,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -123,9 +130,10 @@ class _PantallaMapaState extends State<PantallaMapa> {
               const SizedBox(height: 10),
             ],
           ),
-        );
-      },
-    );
+        ),
+      );
+    },
+  );
   }
 
   @override
@@ -150,26 +158,51 @@ class _PantallaMapaState extends State<PantallaMapa> {
                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                   userAgentPackageName: 'com.tu_dominio.app_artropodos',
                 ),
-                // Capa de los marcadores
-                MarkerLayer(
-                  markers: avistamientos.map((avistamiento) {
-                    final double lat = avistamiento['latitud'];
-                    final double lon = avistamiento['longitud'];
+                // Capa de los marcadores con clustering
+                MarkerClusterLayerWidget(
+                  options: MarkerClusterLayerOptions(
+                    maxClusterRadius: 45,
+                    size: const Size(40, 40),
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.all(50),
+                    maxZoom: 15,
+                    markers: avistamientos.map((avistamiento) {
+                      final double lat = avistamiento['latitud'];
+                      final double lon = avistamiento['longitud'];
 
-                    return Marker(
-                      point: LatLng(lat, lon),
-                      width: 50,
-                      height: 50,
-                      child: GestureDetector(
-                        onTap: () => _mostrarDetalleBottomSheet(avistamiento),
-                        child: const Icon(
-                          Icons.location_on,
-                          color: Colors.red,
-                          size: 45,
+                      return Marker(
+                        point: LatLng(lat, lon),
+                        width: 50,
+                        height: 50,
+                        child: GestureDetector(
+                          onTap: () => _mostrarDetalleBottomSheet(avistamiento),
+                          child: const Icon(
+                            Icons.location_on,
+                            color: Colors.red,
+                            size: 45,
+                          ),
                         ),
-                      ),
-                    );
-                  }).toList(),
+                      );
+                    }).toList(),
+                    builder: (context, markers) {
+                      return Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20),
+                          color: Colors.blue.shade700,
+                          border: Border.all(color: Colors.white, width: 2),
+                        ),
+                        child: Center(
+                          child: Text(
+                            markers.length.toString(),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
