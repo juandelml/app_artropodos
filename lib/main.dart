@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'servicios/api_service.dart';
@@ -99,12 +98,12 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
     }
   }
 
-  // Función para capturar la imagen
-  Future<void> _tomarFoto() async {
-    final XFile? foto = await _picker.pickImage(source: ImageSource.camera);
-    
-    if (foto != null) {
-      try {
+  // Función para seleccionar la imagen (desde cámara o galería)
+  Future<void> _seleccionarImagen(ImageSource origen) async {
+    try {
+      final XFile? foto = await _picker.pickImage(source: origen);
+      
+      if (foto != null) {
         // Leemos los píxeles reales de la imagen de forma asincrónica
         final bytes = await foto.readAsBytes();
         
@@ -125,15 +124,18 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
             _indicesVisibles.clear(); // Limpiamos las selecciones
           });
         }
-      } catch (e) {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error al procesar imagen: $e')),
-          );
-        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al seleccionar imagen: $e')),
+        );
       }
     }
   }
+
+  Future<void> _tomarFoto() => _seleccionarImagen(ImageSource.camera);
+  Future<void> _seleccionarDeGaleria() => _seleccionarImagen(ImageSource.gallery);
 
   // Función para enviar la imagen a Django
   Future<void> _analizarImagen() async {
@@ -244,9 +246,33 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
                   imgAlto: _imgAlto!,
                 )
               else
-                const Padding(
-                  padding: EdgeInsets.all(40.0),
-                  child: Text('Toma una foto para comenzar el análisis.'),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 30.0),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 36.0, horizontal: 20.0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade50,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: Colors.grey.shade300),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.add_photo_alternate_outlined, size: 64, color: Colors.green.shade600),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Toma una foto o selecciona una imagen de la galería para comenzar el análisis.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
 
               // 2. Botón flotante (Chip) para activar/desactivar la caja
@@ -300,27 +326,37 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
               const SizedBox(height: 10),
               
               // 4. Botones principales
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Wrap(
+                spacing: 12,
+                runSpacing: 10,
+                alignment: WrapAlignment.center,
                 children: [
                   ElevatedButton.icon(
                     onPressed: _cargando ? null : _tomarFoto,
                     icon: const Icon(Icons.camera_alt),
                     label: const Text('Tomar Foto'),
                   ),
-                  const SizedBox(width: 15),
-                  if (_imagenSeleccionada != null)
-                    ElevatedButton.icon(
-                      onPressed: _cargando ? null : _analizarImagen,
-                      icon: const Icon(Icons.search),
-                      label: const Text('Analizar'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green.shade700,
-                        foregroundColor: Colors.white,
-                      ),
-                    ),
+                  ElevatedButton.icon(
+                    onPressed: _cargando ? null : _seleccionarDeGaleria,
+                    icon: const Icon(Icons.photo_library),
+                    label: const Text('Galería'),
+                  ),
                 ],
               ),
+
+              if (_imagenSeleccionada != null) ...[
+                const SizedBox(height: 14),
+                ElevatedButton.icon(
+                  onPressed: _cargando ? null : _analizarImagen,
+                  icon: const Icon(Icons.search),
+                  label: const Text('Analizar', style: TextStyle(fontSize: 16)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade700,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+                  ),
+                ),
+              ],
 
               const SizedBox(height: 20),
 

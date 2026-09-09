@@ -6,6 +6,10 @@
 	<string>Se requiere acceso a la ubicación para registrar dónde se tomaron las fotos de los artrópodos.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>Se requiere acceso a la ubicación para registrar los avistamientos.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Se requiere acceso a la cámara para capturar fotos de artrópodos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Se requiere acceso a la galería para seleccionar fotos de artrópodos del dispositivo.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

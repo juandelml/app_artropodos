@@ -3,8 +3,17 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  // IP
-  static const String baseUrlHost = 'http://10.13.100.97:8000';
+  // ==========================================
+  // CONFIGURACIÓN DE CONEXIÓN AL BACKEND
+  // ==========================================
+  // Opción 1: Emulador de Android (10.0.2.2 redirige automáticamente al localhost de tu Mac)
+  static const String baseUrlHost = 'http://10.0.2.2:8000';
+
+  // Opción 2: Celular físico (debe estar conectado a la misma red Wi-Fi que tu Mac)
+  // Nota: Si cambias de red Wi-Fi, obtén tu IP con 'ipconfig getifaddr en0' en la terminal
+  // static const String baseUrlHost = 'http://10.13.100.150:8000';
+  // ==========================================
+
   static const String _baseUrl = '$baseUrlHost/api/clasificar/';
   static const String _historialUrl = '$baseUrlHost/api/historial/';
 

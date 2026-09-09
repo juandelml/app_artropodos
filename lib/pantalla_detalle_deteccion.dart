@@ -340,11 +340,12 @@ class _PintorDetalleDeteccion extends CustomPainter {
     canvas.scale(scale);
     canvas.drawImage(uiImage, Offset.zero, Paint());
 
-    // Dibujar bounding boxes
+    // Dibujar bounding boxes con grosor responsivo
+    final double grosor = scale > 0 ? (2.2 / scale) : 2.4;
     final paint = Paint()
       ..color = Colors.greenAccent
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.0;
+      ..strokeWidth = grosor;
 
     for (int i = 0; i < detecciones.length; i++) {
       if (indicesVisibles.contains(i)) {
@@ -363,15 +364,16 @@ class _PintorDetalleDeteccion extends CustomPainter {
               paint,
             );
 
-            // Dibujar etiqueta con nombre y confianza
+            // Dibujar etiqueta con nombre y confianza de forma responsiva
             final deteccionConfianza = _normalizarConfianzaValor(deteccion['confianza']);
+            final double fontSize = scale > 0 ? (10.0 / scale) : 12.0;
             final textPainter = TextPainter(
               text: TextSpan(
                 text:
                     '${deteccion['clase']?.toString() ?? 'Desconocido'} ${(deteccionConfianza * 100).toStringAsFixed(0)}%',
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.greenAccent,
-                  fontSize: 12,
+                  fontSize: fontSize,
                   fontWeight: FontWeight.bold,
                   backgroundColor: Colors.black54,
                 ),
@@ -379,7 +381,7 @@ class _PintorDetalleDeteccion extends CustomPainter {
               textDirection: TextDirection.ltr,
             );
             textPainter.layout();
-            textPainter.paint(canvas, Offset(x1, y1 - 20));
+            textPainter.paint(canvas, Offset(x1, y1 - (fontSize * 1.4)));
           } catch (e) {
             print('Error dibujando detección: $e');
           }
