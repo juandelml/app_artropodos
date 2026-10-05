@@ -4,6 +4,8 @@ import 'package:http/http.dart' as http;
 import 'dart:typed_data';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'servicios/auth_service.dart';
+import 'servicios/api_service.dart';
 
 double _normalizarConfianzaValor(dynamic valor) {
   if (valor == null) return 0.0;
@@ -86,11 +88,73 @@ class _PantallaDetalleDeteccionState extends State<PantallaDetalleDeteccion> {
       longitud = double.tryParse(widget.registro['longitud'].toString());
     }
     final fecha = (widget.registro['fecha_hora'] ?? widget.registro['fecha'] ?? widget.registro['created_at'])?.toString();
+    final usuarioActual = AuthService.usuarioActualNotifier.value;
+    final idAvistamiento = widget.registro['id']?.toString() ?? '';
+    final usuarioCaptura = widget.registro['usuario']?.toString() ?? 'Anónimo';
+    final institucionCaptura = widget.registro['institucion']?.toString() ?? '';
+    final usuarioIdCaptura = widget.registro['usuario_id']?.toString();
+
+    final puedeBorrar = (usuarioActual?.esAdmin ?? false) ||
+        (usuarioIdCaptura != null && usuarioActual != null && usuarioIdCaptura == usuarioActual.id.toString());
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Detalle de Detección'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          if (puedeBorrar && idAvistamiento.isNotEmpty)
+            IconButton(
+              icon: const Icon(Icons.delete_outline, color: Colors.red),
+              tooltip: 'Eliminar avistamiento',
+              onPressed: () async {
+                final confirmar = await showDialog<bool>(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('Eliminar avistamiento'),
+                    content: const Text(
+                      '¿Estás seguro de que deseas eliminar este registro del historial?',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        child: const Text('Cancelar'),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                        ),
+                        onPressed: () => Navigator.pop(ctx, true),
+                        child: const Text('Eliminar'),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirmar == true && context.mounted) {
+                  final exito = await ApiService.eliminarAvistamiento(idAvistamiento);
+                  if (context.mounted) {
+                    if (exito) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Avistamiento eliminado exitosamente'),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                      Navigator.pop(context);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Error al eliminar el avistamiento'),
+                          backgroundColor: Colors.red,
+                        ),
+                      );
+                    }
+                  }
+                }
+              },
+            ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -158,6 +222,37 @@ class _PantallaDetalleDeteccionState extends State<PantallaDetalleDeteccion> {
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8),
+                  // Registrado por
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: Row(
+                      children: [
+                        Icon(Icons.person, size: 18, color: Colors.green.shade800),
+                        const SizedBox(width: 6),
+                        Text(
+                          'Registrado por: ',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.grey.shade800,
+                          ),
+                        ),
+                        Text(
+                          '@$usuarioCaptura',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.green.shade900,
+                          ),
+                        ),
+                        if (institucionCaptura.isNotEmpty) ...[
+                          const SizedBox(width: 6),
+                          Text(
+                            '($institucionCaptura)',
+                            style: TextStyle(color: Colors.grey.shade600),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
                   if (fecha != null)
                     Padding(
                       padding: const EdgeInsets.only(bottom: 8),

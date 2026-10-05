@@ -4,11 +4,16 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'servicios/api_service.dart';
+import 'servicios/auth_service.dart';
 import 'lienzo_deteccion.dart';
 import 'pantalla_historial.dart';
 import 'pantalla_mapa.dart';
+import 'pantallas/pantalla_login.dart';
+import 'pantallas/dialogo_perfil.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AuthService.inicializarSesion();
   runApp(const MyApp());
 }
 
@@ -23,7 +28,14 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
       ),
-      home: const PantallaPrincipal(),
+      home: ValueListenableBuilder(
+        valueListenable: AuthService.usuarioActualNotifier,
+        builder: (context, usuario, _) {
+          return usuario != null
+              ? const PantallaPrincipal()
+              : const PantallaLogin();
+        },
+      ),
     );
   }
 }
@@ -226,6 +238,40 @@ class _PantallaPrincipalState extends State<PantallaPrincipal> {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const PantallaHistorial()),
+              );
+            },
+          ),
+          ValueListenableBuilder(
+            valueListenable: AuthService.usuarioActualNotifier,
+            builder: (context, usuario, _) {
+              return Padding(
+                padding: const EdgeInsets.only(right: 8.0, left: 4.0),
+                child: IconButton(
+                  tooltip: usuario != null
+                      ? '@${usuario.username} (${usuario.esAdmin ? 'Admin' : 'Observador'})'
+                      : 'Perfil',
+                  icon: CircleAvatar(
+                    radius: 16,
+                    backgroundColor: (usuario?.esAdmin ?? false)
+                        ? Colors.amber.shade200
+                        : Colors.green.shade200,
+                    child: Text(
+                      usuario != null && usuario.nombre.isNotEmpty
+                          ? usuario.nombre[0].toUpperCase()
+                          : '?',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: (usuario?.esAdmin ?? false)
+                            ? Colors.amber.shade900
+                            : Colors.green.shade900,
+                      ),
+                    ),
+                  ),
+                  onPressed: () {
+                    DialogoPerfil.mostrar(context, usuario);
+                  },
+                ),
               );
             },
           ),

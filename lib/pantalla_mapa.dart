@@ -120,6 +120,29 @@ class _PantallaMapaState extends State<PantallaMapa> {
                   ),
                 ),
                 
+              // Autor de la captura
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.person, size: 16, color: Colors.green.shade800),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Por @${avistamiento['usuario'] ?? 'Anónimo'}',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.green.shade900,
+                    ),
+                  ),
+                  if (avistamiento['institucion'] != null && avistamiento['institucion'].toString().isNotEmpty) ...[
+                    const SizedBox(width: 6),
+                    Text(
+                      '(${avistamiento['institucion']})',
+                      style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                    ),
+                  ],
+                ],
+              ),
               const SizedBox(height: 10),
               // Fecha
               if (avistamiento['fecha_hora'] != null)
