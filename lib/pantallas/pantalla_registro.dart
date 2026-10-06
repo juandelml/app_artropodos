@@ -20,7 +20,6 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  String _rolSeleccionado = 'observador';
   bool _cargando = false;
   bool _mostrarPassword = false;
 
@@ -48,7 +47,7 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
       email: _emailController.text,
       password: _passwordController.text,
       institucion: _institucionController.text,
-      rol: _rolSeleccionado,
+      rol: 'observador',
     );
 
     if (!mounted) return;
@@ -57,7 +56,7 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
     if (resultado['exito'] == true) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('¡Cuenta creada exitosamente como ${_rolSeleccionado == 'admin' ? 'Administrador' : 'Observador'}!'),
+          content: const Text('¡Cuenta creada exitosamente!'),
           backgroundColor: Colors.green.shade700,
         ),
       );
@@ -232,143 +231,9 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: 16),
 
-                            // 5. Selector de Rol
-                            Text(
-                              'Tipo de Cuenta (Rol):',
-                              style: theme.textTheme.titleSmall?.copyWith(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            // Selector de roles personalizado y moderno
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: InkWell(
-                                    onTap: () {
-                                      setState(() => _rolSeleccionado = 'observador');
-                                    },
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: _rolSeleccionado == 'observador'
-                                            ? Colors.green.shade50
-                                            : Colors.grey.shade50,
-                                        border: Border.all(
-                                          color: _rolSeleccionado == 'observador'
-                                              ? Colors.green.shade700
-                                              : Colors.grey.shade300,
-                                          width: _rolSeleccionado == 'observador' ? 2 : 1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                Icons.remove_red_eye,
-                                                size: 18,
-                                                color: _rolSeleccionado == 'observador'
-                                                    ? Colors.green.shade800
-                                                    : Colors.grey.shade700,
-                                              ),
-                                              const SizedBox(width: 6),
-                                              Expanded(
-                                                child: Text(
-                                                  'Observador',
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: _rolSeleccionado == 'observador'
-                                                        ? Colors.green.shade900
-                                                        : Colors.black87,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            'Para registrar y clasificar avistamientos.',
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: Colors.grey.shade600,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: InkWell(
-                                    onTap: () {
-                                      setState(() => _rolSeleccionado = 'admin');
-                                    },
-                                    borderRadius: BorderRadius.circular(12),
-                                    child: Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: _rolSeleccionado == 'admin'
-                                            ? Colors.amber.shade50
-                                            : Colors.grey.shade50,
-                                        border: Border.all(
-                                          color: _rolSeleccionado == 'admin'
-                                              ? Colors.amber.shade700
-                                              : Colors.grey.shade300,
-                                          width: _rolSeleccionado == 'admin' ? 2 : 1,
-                                        ),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                Icons.shield,
-                                                size: 18,
-                                                color: _rolSeleccionado == 'admin'
-                                                    ? Colors.amber.shade900
-                                                    : Colors.grey.shade700,
-                                              ),
-                                              const SizedBox(width: 6),
-                                              Expanded(
-                                                child: Text(
-                                                  'Admin',
-                                                  style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    color: _rolSeleccionado == 'admin'
-                                                        ? Colors.amber.shade900
-                                                        : Colors.black87,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          const SizedBox(height: 4),
-                                          Text(
-                                            'Gestión, moderación y control total.',
-                                            style: TextStyle(
-                                              fontSize: 11,
-                                              color: Colors.grey.shade600,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-
-                            // 6. Contraseña
+                            // 5. Contraseña
                             TextFormField(
                               controller: _passwordController,
                               obscureText: !_mostrarPassword,
@@ -403,7 +268,7 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                             ),
                             const SizedBox(height: 16),
 
-                            // 7. Confirmar Contraseña
+                            // 6. Confirmar Contraseña
                             TextFormField(
                               controller: _confirmPasswordController,
                               obscureText: !_mostrarPassword,
@@ -420,24 +285,6 @@ class _PantallaRegistroState extends State<PantallaRegistro> {
                                 }
                                 return null;
                               },
-                            ),
-                            const SizedBox(height: 12),
-
-                            // Nota de fecha de registro automática
-                            Row(
-                              children: [
-                                Icon(Icons.check_circle_outline, size: 16, color: Colors.green.shade700),
-                                const SizedBox(width: 6),
-                                Expanded(
-                                  child: Text(
-                                    'La fecha de registro será asignada automáticamente por el sistema.',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey.shade600,
-                                    ),
-                                  ),
-                                ),
-                              ],
                             ),
                             const SizedBox(height: 24),
 
