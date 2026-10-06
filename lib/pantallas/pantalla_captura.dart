@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import '../servicios/api_service.dart';
 import '../servicios/auth_service.dart';
 import '../lienzo_deteccion.dart';
+import '../pantalla_detalle_deteccion.dart';
 import 'dialogo_perfil.dart';
 
 class PantallaCaptura extends StatefulWidget {
@@ -115,20 +116,57 @@ class _PantallaCapturaState extends State<PantallaCaptura> {
       );
 
       if (mounted) {
-        setState(() {
-          _resultados = respuesta;
-          _cargando = false;
-          _indicesVisibles.clear();
-          if (respuesta != null && respuesta['exito'] == true && respuesta['detecciones'] != null) {
-            for (int i = 0; i < (respuesta['detecciones'] as List).length; i++) {
-              _indicesVisibles.add(i);
-            }
-          }
-        });
-
         if (respuesta == null) {
+          setState(() => _cargando = false);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Error: No se recibió respuesta del servidor')),
+          );
+        } else if (respuesta['exito'] == false ||
+            respuesta['detecciones'] == null ||
+            (respuesta['detecciones'] as List).isEmpty) {
+          setState(() {
+            _resultados = respuesta;
+            _cargando = false;
+          });
+          final mensaje = respuesta['mensaje']?.toString() ?? 'No se detectó ningún artrópodo en la imagen.';
+          _mostrarDialogoSinDetecciones(mensaje);
+        } else {
+          // ¡Éxito en la detección!
+          final fotoLocal = _imagenSeleccionada;
+          final usuarioActual = AuthService.usuarioActualNotifier.value;
+
+          final registro = {
+            'id': respuesta['id'],
+            'imagen_url': respuesta['imagen_url'],
+            'archivo_local': fotoLocal,
+            'fecha_hora': respuesta['fecha_hora'] ?? DateTime.now().toIso8601String(),
+            'latitud': posicionLatLng?.latitude ?? respuesta['latitud'],
+            'longitud': posicionLatLng?.longitude ?? respuesta['longitud'],
+            'detecciones': respuesta['detecciones'],
+            'usuario': respuesta['usuario'] ?? usuarioActual?.username ?? 'Anónimo',
+            'institucion': respuesta['institucion'] ?? usuarioActual?.institucion ?? '',
+            'usuario_id': respuesta['usuario_id'] ?? usuarioActual?.id.toString(),
+          };
+
+          final count = (respuesta['detecciones'] as List).length;
+
+          // Limpiamos el formulario de captura para evitar reenvíos duplicados
+          _limpiarCaptura();
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('¡Se detectaron $count artrópodo(s)! Mostrando detalle...'),
+              backgroundColor: Colors.green.shade700,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+
+          // Navegamos directamente a la pantalla de detalle
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PantallaDetalleDeteccion(registro: registro),
+            ),
           );
         }
       }
@@ -140,6 +178,87 @@ class _PantallaCapturaState extends State<PantallaCaptura> {
         );
       }
     }
+  }
+
+  void _mostrarDialogoSinDetecciones(String mensaje) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Icon(Icons.search_off_rounded, size: 54, color: Colors.orange.shade800),
+                const SizedBox(height: 12),
+                Text(
+                  'No se detectaron artrópodos',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  mensaje,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 14, color: Colors.black87),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Nota: Esta fotografía no se guardó en la base de datos ni en el historial. Intenta tomar una nueva foto con mejor iluminación y mayor acercamiento al insecto o arácnido.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          _tomarFoto();
+                        },
+                        icon: const Icon(Icons.camera_alt),
+                        label: const Text('Tomar otra'),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          _seleccionarDeGaleria();
+                        },
+                        icon: const Icon(Icons.photo_library),
+                        label: const Text('Galería'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green.shade700,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   void _limpiarCaptura() {
@@ -367,50 +486,75 @@ class _PantallaCapturaState extends State<PantallaCaptura> {
                     ),
                   ],
                 )
-              else if (_resultados != null && _resultados!['exito'] == true)
+              else if (_resultados != null && _resultados!['exito'] == true && _resultados!['detecciones'] != null && (_resultados!['detecciones'] as List).isNotEmpty)
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: _resultados!['detecciones'] != null && (_resultados!['detecciones'] as List).isNotEmpty
-                      ? Column(
-                          children: [
-                            const Icon(Icons.check_circle, color: Colors.green, size: 48),
-                            const SizedBox(height: 8),
-                            if (_resultados!['tiempo_servidor_ms'] != null)
-                              Text(
-                                'Procesado en: ${_resultados!['tiempo_servidor_ms']} ms',
-                                style: const TextStyle(fontSize: 12, color: Colors.grey),
-                              ),
-                            const SizedBox(height: 12),
-                            Text(
-                              '${(_resultados!['detecciones'] as List).length} artrópodo(s) detectado(s)',
-                              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 12),
-                            for (var det in (_resultados!['detecciones'] as List))
-                              Card(
-                                margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                                child: ListTile(
-                                  leading: const Icon(Icons.pest_control, color: Colors.green),
-                                  title: Text(
-                                    det['clase']?.toString() ?? '',
-                                    style: const TextStyle(fontWeight: FontWeight.bold),
-                                  ),
-                                  subtitle: Text('Confianza: ${det['confianza']}'),
-                                ),
-                              ),
-                          ],
-                        )
-                      : const Column(
-                          children: [
-                            Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 48),
-                            SizedBox(height: 8),
-                            Text(
-                              'No se detectaron artrópodos en la foto.',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                            ),
-                          ],
+                  child: Column(
+                    children: [
+                      const Icon(Icons.check_circle, color: Colors.green, size: 48),
+                      const SizedBox(height: 8),
+                      if (_resultados!['tiempo_servidor_ms'] != null)
+                        Text(
+                          'Procesado en: ${_resultados!['tiempo_servidor_ms']} ms',
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
                         ),
+                      const SizedBox(height: 12),
+                      Text(
+                        '${(_resultados!['detecciones'] as List).length} artrópodo(s) detectado(s)',
+                        style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 12),
+                      for (var det in (_resultados!['detecciones'] as List))
+                        Card(
+                          margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          child: ListTile(
+                            leading: const Icon(Icons.pest_control, color: Colors.green),
+                            title: Text(
+                              det['clase']?.toString() ?? '',
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text('Confianza: ${det['confianza']}'),
+                          ),
+                        ),
+                    ],
+                  ),
+                )
+              else if (_resultados != null && (_resultados!['exito'] == false || _resultados!['detecciones'] == null || (_resultados!['detecciones'] as List).isEmpty))
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 8.0),
+                  child: Card(
+                    elevation: 1,
+                    color: Colors.orange.shade50,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      side: BorderSide(color: Colors.orange.shade300),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        children: [
+                          Icon(Icons.search_off_rounded, color: Colors.orange.shade800, size: 54),
+                          const SizedBox(height: 10),
+                          Text(
+                            _resultados!['mensaje']?.toString() ?? 'No se detectó ningún artrópodo en la imagen.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.brown.shade900,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Esta foto no se guardó en el historial. Intenta tomar una nueva foto donde el artrópodo esté más enfocado, centrado o con mejor iluminación.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(fontSize: 13, color: Colors.brown.shade700),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
             ],
           ),

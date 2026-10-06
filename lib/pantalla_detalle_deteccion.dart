@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:ui' as ui;
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'dart:typed_data';
 import 'package:flutter_map/flutter_map.dart';
@@ -54,6 +55,21 @@ class _PantallaDetalleDeteccionState extends State<PantallaDetalleDeteccion> {
 
   Future<ui.Image> _cargarImagen() async {
     try {
+      final archivoLocal = widget.registro['archivo_local'];
+      if (archivoLocal != null) {
+        try {
+          final File file = archivoLocal is File ? archivoLocal : File(archivoLocal.toString());
+          if (await file.exists()) {
+            final Uint8List bytes = await file.readAsBytes();
+            final ui.Codec codec = await ui.instantiateImageCodec(bytes);
+            final ui.FrameInfo frameInfo = await codec.getNextFrame();
+            return frameInfo.image;
+          }
+        } catch (e) {
+          print('[DETALLE] No se pudo cargar archivo local, intentando URL: $e');
+        }
+      }
+
       final rutaImagen = widget.registro['imagen_url'] as String?;
       if (rutaImagen == null || rutaImagen.isEmpty) {
         throw Exception('No se encontró URL de imagen');
