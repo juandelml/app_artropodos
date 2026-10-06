@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'servicios/api_service.dart';
 import 'servicios/auth_service.dart';
 import 'pantalla_detalle_deteccion.dart';
+import 'pantallas/dialogo_perfil.dart';
 
 class PantallaHistorial extends StatefulWidget {
   const PantallaHistorial({super.key});
@@ -108,6 +109,33 @@ class _PantallaHistorialState extends State<PantallaHistorial> {
             icon: const Icon(Icons.refresh),
             onPressed: _cargarHistorial,
             tooltip: 'Actualizar historial',
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0, left: 4.0),
+            child: IconButton(
+              tooltip: usuarioActual != null
+                  ? '@${usuarioActual.username} (${usuarioActual.esAdmin ? 'Admin' : 'Observador'})'
+                  : 'Perfil',
+              icon: CircleAvatar(
+                radius: 16,
+                backgroundColor: (usuarioActual?.esAdmin ?? false)
+                    ? Colors.amber.shade200
+                    : Colors.green.shade200,
+                child: Text(
+                  usuarioActual != null && usuarioActual.nombre.isNotEmpty
+                      ? usuarioActual.nombre[0].toUpperCase()
+                      : '?',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: (usuarioActual?.esAdmin ?? false)
+                        ? Colors.amber.shade900
+                        : Colors.green.shade900,
+                  ),
+                ),
+              ),
+              onPressed: () => DialogoPerfil.mostrar(context, usuarioActual),
+            ),
           ),
         ],
       ),

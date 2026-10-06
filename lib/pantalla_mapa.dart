@@ -4,6 +4,8 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:latlong2/latlong.dart';
 import 'pantalla_detalle_deteccion.dart';
 import 'servicios/api_service.dart';
+import 'servicios/auth_service.dart';
+import 'pantallas/dialogo_perfil.dart';
 
 class PantallaMapa extends StatefulWidget {
   const PantallaMapa({super.key});
@@ -161,11 +163,47 @@ class _PantallaMapaState extends State<PantallaMapa> {
 
   @override
   Widget build(BuildContext context) {
+    final usuarioActual = AuthService.usuarioActualNotifier.value;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mapa de Avistamientos'),
         backgroundColor: Colors.green.shade700,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Actualizar mapa',
+            onPressed: fetchUbicaciones,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0, left: 4.0),
+            child: IconButton(
+              tooltip: usuarioActual != null
+                  ? '@${usuarioActual.username} (${usuarioActual.esAdmin ? 'Admin' : 'Observador'})'
+                  : 'Perfil',
+              icon: CircleAvatar(
+                radius: 16,
+                backgroundColor: (usuarioActual?.esAdmin ?? false)
+                    ? Colors.amber.shade200
+                    : Colors.white,
+                child: Text(
+                  usuarioActual != null && usuarioActual.nombre.isNotEmpty
+                      ? usuarioActual.nombre[0].toUpperCase()
+                      : '?',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: (usuarioActual?.esAdmin ?? false)
+                        ? Colors.amber.shade900
+                        : Colors.green.shade800,
+                  ),
+                ),
+              ),
+              onPressed: () => DialogoPerfil.mostrar(context, usuarioActual),
+            ),
+          ),
+        ],
       ),
       body: cargando
           ? const Center(child: CircularProgressIndicator())
