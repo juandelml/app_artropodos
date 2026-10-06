@@ -25,7 +25,7 @@ class ApiService {
   }
 
   /// Función para obtener el historial de avistamientos
-  static Future<List<dynamic>?> obtenerHistorial() async {
+  static Future<List<dynamic>?> obtenerHistorial({bool soloMios = false}) async {
     try {
       final token = await _obtenerToken();
       final headers = <String, String>{
@@ -35,7 +35,8 @@ class ApiService {
         headers['Authorization'] = 'Token $token';
       }
 
-      var response = await http.get(Uri.parse(_historialUrl), headers: headers);
+      final url = soloMios ? '$_historialUrl?solo_mios=true' : _historialUrl;
+      var response = await http.get(Uri.parse(url), headers: headers);
       if (response.statusCode == 200) {
         var body = jsonDecode(response.body);
         return body is List ? body : body['resultados'];
