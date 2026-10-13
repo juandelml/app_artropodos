@@ -4,7 +4,7 @@ El **Dashboard** es la pantalla de inicio de la aplicación, diseñada para ofre
 
 ---
 
-## 🧭 Barra de Navegación Inferior
+## Barra de Navegación Inferior
 
 En la parte inferior de la aplicación se encuentra la barra de navegación persistente con 4 pestañas clave:
 
@@ -15,7 +15,7 @@ En la parte inferior de la aplicación se encuentra la barra de navegación pers
 
 ---
 
-## 📊 Secciones del Dashboard
+## Secciones del Dashboard
 
 ### 1. Saludo Personalizado y Perfil
 En la parte superior se muestra tu nombre y un distintivo con tu rol (*Observador* o *Administrador*), junto con un botón rápido para abrir tu perfil o cerrar sesión.
@@ -40,5 +40,5 @@ Un carrusel horizontal con las últimas fotos que has tomado. Cada tarjeta muest
 ### 5. Últimas Capturas de la Comunidad
 Un listado con las observaciones más recientes compartidas por otros usuarios e investigadores, fomentando la colaboración científica y la revisión colectiva.
 
-> [!TIP]
+> [!NOTE]
 > Puedes deslizar la pantalla hacia abajo (*Pull-to-refresh*) en cualquier momento para recargar las estadísticas y avistamientos más recientes.

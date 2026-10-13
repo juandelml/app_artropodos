@@ -4,7 +4,7 @@ La pestaña **Capturar** es el núcleo de visión computacional de la aplicació
 
 ---
 
-## 📸 Flujo Paso a Paso para una Detección
+## Flujo Paso a Paso para una Detección
 
 ```
 1. Seleccionar Fuente ────► 2. Vista Previa ────► 3. Ubicación GPS ────► 4. Analizar Ahora ────► 5. Redirección al Detalle
@@ -16,8 +16,8 @@ Elige entre las dos opciones disponibles:
 * **Botón "Cámara":** Abre la cámara nativa del teléfono para tomar una foto en vivo.
 * **Botón "Galería":** Abre el selector de medios para importar una imagen guardada previamente.
 
-> [!TIP]
-> **Consejos para una mejor detección:**
+> [!NOTE]
+> **Recomendaciones para una mejor detección:**
 > * Asegúrate de tener buena luz natural o enfocar adecuadamente el espécimen.
 > * Intenta que el insecto o arácnido ocupe una porción representativa del encuadre.
 > * Evita fondos con patrones excesivamente caóticos si el espécimen es muy pequeño.
@@ -37,7 +37,7 @@ Presiona el botón verde **"Analizar Ahora"**:
 
 ---
 
-## 🚦 Resultados Posibles de la Inferencia
+## Resultados Posibles de la Inferencia
 
 ### Caso A: Detección Exitosa (Artrópodos Identificados)
 1. El servidor identifica las cajas delimitadoras y clasifica los órdenes correspondientes.

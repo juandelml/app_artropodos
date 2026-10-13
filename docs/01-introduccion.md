@@ -4,7 +4,7 @@ Este proyecto surge como parte del trabajo de tesis en el **Centro de Investigac
 
 ---
 
-## 🔬 Arquitectura del Sistema
+## Arquitectura del Sistema
 
 El ecosistema se compone de dos componentes principales interconectados:
 
@@ -26,7 +26,7 @@ El ecosistema se compone de dos componentes principales interconectados:
 
 ---
 
-## 🧠 Modelos de Inteligencia Artificial Empleados
+## Modelos de Inteligencia Artificial Empleados
 
 Para lograr una identificación rápida y precisa, el servidor ejecuta una tubería (*pipeline*) híbrida de dos etapas:
 
@@ -48,7 +48,7 @@ Para lograr una identificación rápida y precisa, el servidor ejecuta una tuber
 
 ---
 
-## 🔒 Privacidad y Almacenamiento
+## Seguridad y Almacenamiento
 
 * **Contraseñas Seguras:** Las credenciales de usuario se protegen mediante algoritmos de derivación de claves basados en PBKDF2 con sal y 1,000,000 de iteraciones.
 * **Comunicación Segura:** Todas las peticiones autenticadas utilizan cabeceras `Authorization: Token <token>`.

@@ -4,7 +4,7 @@ El sistema cuenta con un esquema de autenticación seguro basado en tokens, dise
 
 ---
 
-## 📝 Registro de Nuevo Usuario
+## Registro de Nuevo Usuario
 
 Si no tienes una cuenta creada:
 
@@ -22,7 +22,7 @@ Si no tienes una cuenta creada:
 
 ---
 
-## 🔑 Inicio de Sesión
+## Inicio de Sesión
 
 1. Abre la aplicación e ingresa tu **Correo electrónico** y **Contraseña**.
 2. Presiona **"Iniciar Sesión"**.
@@ -30,7 +30,7 @@ Si no tienes una cuenta creada:
 
 ---
 
-## 👤 Gestión del Perfil y Cierre de Sesión
+## Gestión del Perfil y Cierre de Sesión
 
 En la esquina superior derecha de todas las pantallas principales encontrarás tu **avatar de usuario**:
 * **Borde y fondo verde:** Cuenta de tipo *Observador*.
@@ -42,14 +42,14 @@ Al tocar este avatar se desplegará el **Diálogo de Perfil**:
 
 ---
 
-## 👥 Tabla Comparativa de Roles
+## Tabla Comparativa de Roles
 
 | Característica / Permiso | Observador | Administrador |
 | :--- | :---: | :---: |
-| Capturar fotos y analizar artrópodos | ✅ | ✅ |
-| Guardar ubicación GPS en MongoDB | ✅ | ✅ |
-| Consultar sus propias capturas en el Historial | ✅ | ✅ |
-| Consultar capturas de otros usuarios en el Historial | ❌ *(Solo propias)* | ✅ *(Todas las de la comunidad)* |
-| Visualizar todas las observaciones en el Mapa global | ✅ | ✅ |
-| Eliminar sus propias capturas | ✅ | ✅ |
-| Eliminar capturas de otros usuarios (Moderación) | ❌ | ✅ |
+| Capturar fotos y analizar artrópodos | Sí | Sí |
+| Guardar ubicación GPS en MongoDB | Sí | Sí |
+| Consultar sus propias capturas en el Historial | Sí | Sí |
+| Consultar capturas de otros usuarios en el Historial | No *(Solo propias)* | Sí *(Todas las de la comunidad)* |
+| Visualizar todas las observaciones en el Mapa global | Sí | Sí |
+| Eliminar sus propias capturas | Sí | Sí |
+| Eliminar capturas de otros usuarios (Moderación) | No | Sí |

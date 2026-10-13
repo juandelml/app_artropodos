@@ -4,7 +4,7 @@ La pestaña **Historial** permite consultar el catálogo cronológico de captura
 
 ---
 
-## 👥 Comportamiento según el Rol del Usuario
+## Comportamiento según el Rol del Usuario
 
 La interfaz adapta automáticamente su contenido y permisos dependiendo del tipo de cuenta con la que iniciaste sesión:
 
@@ -22,7 +22,7 @@ La interfaz adapta automáticamente su contenido y permisos dependiendo del tipo
 
 ---
 
-## 🗂️ Elementos de cada Tarjeta de Avistamiento
+## Elementos de cada Tarjeta de Avistamiento
 
 Cada fila del historial presenta una síntesis clave de la observación:
 

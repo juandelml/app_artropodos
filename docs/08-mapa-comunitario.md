@@ -4,7 +4,7 @@ La pestaña **Mapa** convierte las observaciones de campo en una cartografía vi
 
 ---
 
-## 🗺️ Visualización Cartográfica Interactiva
+## Visualización Cartográfica Interactiva
 
 El mapa utiliza capas vectoriales abiertas de **OpenStreetMap** optimizadas para dispositivos móviles con soporte para gestos táctiles de paneo, rotación y zoom:
 
@@ -15,7 +15,7 @@ El mapa utiliza capas vectoriales abiertas de **OpenStreetMap** optimizadas para
 
 ---
 
-## 📍 Marcadores y Vista Rápida
+## Marcadores y Vista Rápida
 
 1. **Marcador Individual:** Cada punto rojo representa una fotografía tomada con ubicación satelital activa.
 2. **Ficha Rápida (Bottom Sheet):** Al pulsar sobre cualquier marcador rojo en el mapa, se desplegará una tarjeta emergente en la parte inferior con:
@@ -27,6 +27,6 @@ El mapa utiliza capas vectoriales abiertas de **OpenStreetMap** optimizadas para
 
 ---
 
-## 🔄 Actualización de Datos
+## Actualización de Datos
 
 Si estás en campo y otros investigadores han subido capturas recientemente, toca el botón de **Refrescar** en la esquina superior derecha para recargar las coordenadas y nuevos avistamientos en tiempo real.

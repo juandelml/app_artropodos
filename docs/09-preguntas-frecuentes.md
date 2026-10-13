@@ -4,7 +4,7 @@ Encuentra aquí respuestas a las dudas más habituales sobre el funcionamiento d
 
 ---
 
-## ❓ Preguntas Frecuentes (FAQ)
+## Preguntas Frecuentes (FAQ)
 
 ### 1. ¿Por qué la app dice "No se detectaron artrópodos" en mi foto?
 Para garantizar la calidad de la base de datos de la investigación, el modelo YOLOv8 aplica un umbral de confianza mínimo. Si la fotografía está desenfocada, muy lejana, con sombras densas o el artrópodo se camufla excesivamente con el entorno, el sistema descartará la foto para no guardar datos erróneos.
@@ -25,10 +25,10 @@ No. Si el sistema no detecta ningún artrópodo en la imagen, la foto **es desca
 
 ---
 
-## 🛠️ Solución de Problemas Comunes
+## Solución de Problemas Comunes
 
 | Síntoma / Problema | Causa Probable | Solución Recomendada |
 | :--- | :--- | :--- |
 | **"Error de conexión con el servidor"** | El teléfono no tiene internet o el servidor Django está apagado/inaccesible en la red local. | Verifica tu conexión Wi-Fi/móvil y asegúrate de que la dirección IP del servidor esté configurada correctamente en los ajustes de la app. |
 | **"Timeout: El servidor tardó más de 120s"** | La imagen es extremadamente pesada en píxeles o la conexión es muy lenta. | Intenta tomar la foto con una resolución estándar o reintenta con una red más estable. |
-| **"Permiso de cámara o ubicación denegado permanentemente"** | Se seleccionó "No volver a preguntar" en el diálogo del sistema operativo. | Ve a Ajustes del teléfono ➔ Aplicaciones ➔ *Clasificador de Artrópodos* ➔ Permisos ➔ Activa Cámara y Ubicación. |
+| **"Permiso de cámara o ubicación denegado permanentemente"** | Se seleccionó "No volver a preguntar" en el diálogo del sistema operativo. | Ve a Ajustes del teléfono > Aplicaciones > *Clasificador de Artrópodos* > Permisos > Activar Cámara y Ubicación. |

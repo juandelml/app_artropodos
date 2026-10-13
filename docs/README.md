@@ -4,7 +4,7 @@ Bienvenido al manual oficial de usuario de la **Aplicación Móvil para la Detec
 
 ---
 
-## 🎯 Propósito del Sistema
+## Propósito del Sistema
 
 El objetivo principal de esta aplicación es ofrecer una herramienta de ciencia ciudadana e investigación biológica que permita a cualquier usuario identificar órdenes de artrópodos (insectos y arácnidos) en tiempo real a partir de fotografías tomadas en campo o cargadas desde la galería.
 
@@ -12,7 +12,7 @@ Combinando técnicas de **Visión por Computadora** e **Inteligencia Artificial 
 
 ---
 
-## 📱 Características Principales
+## Características Principales
 
 * **Identificación Automática:** Localización espacial de artrópodos mediante cajas delimitadoras (*bounding boxes*) y predicción de orden biológico con porcentaje de confianza.
 * **Geolocalización GPS:** Registro de coordenadas exactas para cada observación en campo.
@@ -23,7 +23,7 @@ Combinando técnicas de **Visión por Computadora** e **Inteligencia Artificial 
 
 ---
 
-## 📖 ¿Cómo navegar este manual?
+## Estructura del Manual
 
 Utiliza el menú lateral izquierdo para explorar cada sección en orden cronológico o dirígete directamente al tema que necesites:
 

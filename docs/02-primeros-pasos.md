@@ -4,7 +4,7 @@ En esta sección se describen los requerimientos mínimos del dispositivo y las 
 
 ---
 
-## 📱 Requisitos del Dispositivo
+## Requisitos del Dispositivo
 
 * **Sistema Operativo:**
   * Android 7.0 (API nivel 24) o superior.
@@ -17,7 +17,7 @@ En esta sección se describen los requerimientos mínimos del dispositivo y las 
 
 ---
 
-## 🔑 Permisos del Sistema
+## Permisos del Sistema
 
 Al abrir la aplicación por primera vez o al usar funciones específicas, el sistema operativo solicitará los siguientes permisos:
 
@@ -27,12 +27,12 @@ Al abrir la aplicación por primera vez o al usar funciones específicas, el sis
 | **Galería / Fotos** | Permite seleccionar fotografías tomadas previamente en el dispositivo. | Opcional |
 | **Ubicación (GPS)** | Obtiene las coordenadas geográficas (latitud y longitud) del avistamiento para situarlo en el mapa. | Opcional (se puede desactivar con un switch) |
 
-> [!TIP]
+> [!NOTE]
 > Si deniegas accidentalmente algún permiso, puedes habilitarlo en cualquier momento desde los **Ajustes / Configuración de Aplicaciones** de tu teléfono móvil.
 
 ---
 
-## 🚀 Flujo de Inicio de la Aplicación
+## Flujo de Inicio de la Aplicación
 
 Al abrir la aplicación:
 

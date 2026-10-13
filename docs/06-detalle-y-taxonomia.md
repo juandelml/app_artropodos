@@ -4,7 +4,7 @@ La **Pantalla de Detalle de Detección** ofrece una vista exhaustiva e interacti
 
 ---
 
-## 🖼️ Inspección de la Fotografía y Cajas Delimitadoras
+## Inspección de la Fotografía y Cajas Delimitadoras
 
 En la sección superior se muestra la imagen con las cajas de detección (*bounding boxes*) renderizadas sobre cada artrópodo localizado:
 
@@ -14,7 +14,7 @@ En la sección superior se muestra la imagen con las cajas de detección (*bound
 
 ---
 
-## 🔍 Visor en Pantalla Completa con Zoom
+## Visor en Pantalla Completa con Zoom
 
 Al tocar la fotografía en cualquier parte, se abrirá el **Visor de Pantalla Completa**:
 
@@ -26,7 +26,7 @@ Al tocar la fotografía en cualquier parte, se abrirá el **Visor de Pantalla Co
 
 ---
 
-## 📋 Ficha Taxonómica y Datos de Campo
+## Ficha Taxonómica y Datos de Campo
 
 Debajo de la imagen se despliega la ficha biológica estructurada:
 
@@ -45,7 +45,7 @@ Por cada artrópodo detectado se desglosa su árbol taxonómico:
 
 ---
 
-## 🗑️ Eliminación de Registros
+## Eliminación de Registros
 
 En la barra superior encontrarás un botón de papelera roja para **eliminar el avistamiento**:
 * **Usuarios Observadores:** Pueden eliminar únicamente sus propias capturas.
