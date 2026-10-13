@@ -79,6 +79,7 @@ class _PantallaCapturaState extends State<PantallaCaptura> {
             _imgAncho = image.width.toDouble();
             _imgAlto = image.height.toDouble();
             _resultados = null;
+            _cargando = false;
             _indicesVisibles.clear();
           });
         }
@@ -150,7 +151,7 @@ class _PantallaCapturaState extends State<PantallaCaptura> {
 
           final count = (respuesta['detecciones'] as List).length;
 
-          // Limpiamos el formulario de captura para evitar reenvíos duplicados
+          // Limpiamos el formulario de captura y apagamos el estado de carga
           _limpiarCaptura();
 
           ScaffoldMessenger.of(context).showSnackBar(
@@ -161,13 +162,18 @@ class _PantallaCapturaState extends State<PantallaCaptura> {
             ),
           );
 
-          // Navegamos directamente a la pantalla de detalle
-          Navigator.push(
+          // Navegamos a la pantalla de detalle
+          await Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => PantallaDetalleDeteccion(registro: registro),
             ),
           );
+
+          // Al regresar de la pantalla de detalle, aseguramos que la pantalla esté limpia y lista
+          if (mounted) {
+            _limpiarCaptura();
+          }
         }
       }
     } catch (e) {
@@ -264,6 +270,7 @@ class _PantallaCapturaState extends State<PantallaCaptura> {
   void _limpiarCaptura() {
     setState(() {
       _imagenSeleccionada = null;
+      _cargando = false;
       _resultados = null;
       _imgAncho = null;
       _imgAlto = null;
