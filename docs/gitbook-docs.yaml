@@ -1,0 +1,11 @@
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+site:
+  title: Manual de Usuario - Clasificador de Artrópodos
+  structure:
+    - type: space
+      key: manual-artropodos
+      title: Manual de Usuario
+      path: manual
+      default: true
+      content:
+        directory: .
