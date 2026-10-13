@@ -26,22 +26,20 @@ Al tocar la fotografía en cualquier parte, se abrirá el **Visor de Pantalla Co
 
 ---
 
-## Ficha Taxonómica y Datos de Campo
+## Información de la Captura y Artrópodos Detectados
 
-Debajo de la imagen se despliega la ficha biológica estructurada:
+Debajo de la imagen se despliegan los datos de la observación y el desglose de cada espécimen encontrado:
 
 ### 1. Metadatos de la Observación
-* **Autor:** Nombre de usuario (`@username`) e institución.
-* **Fecha y Hora:** Formato local legible (`DD/MM/AAAA - HH:MM`).
-* **Coordenadas Satelitales:** Latitud y longitud con botón para situar la captura en el mapa.
+* **Registrado por:** Nombre de usuario (`@username`) e institución a la que pertenece.
+* **Fecha y Hora:** Fecha y hora en la que se tomó o subió la imagen (`DD/MM/AAAA - HH:MM`).
+* **Ubicación:** Coordenadas de latitud y longitud satelitales (si se incluyó GPS al capturar), acompañadas del botón **"Ver en Mapa"** para ubicar el avistamiento geográficamente.
 
-### 2. Clasificación Jerárquica
-Por cada artrópodo detectado se desglosa su árbol taxonómico:
-* **Reino:** *Animalia*
-* **Filo:** *Arthropoda*
-* **Clase:** *Insecta* (para insectos de 6 patas) o *Arachnida* (para arañas de 8 patas).
-* **Orden:** Nombre científico y nombre común en español.
-* **Barra de Certeza:** Gráfico proporcional que ilustra la probabilidad calculada por la red MobileNetV3.
+### 2. Tarjetas de Detección por Espécimen
+Por cada artrópodo individual detectado en la fotografía, se muestra una tarjeta con:
+* **Orden Identificado:** El orden biológico al que pertenece el ejemplar (por ejemplo, *Coleoptera*, *Lepidoptera*, *Araneae*, *Hymenoptera*, *Diptera*, *Hemiptera* u *Odonata*).
+* **Insignia de Certeza:** Porcentaje numérico de confianza que indica la certidumbre calculada por el modelo MobileNetV3 (por ejemplo, `95.4%`).
+* **Posición en Imagen:** Coordenadas de la caja delimitadora $(x_1, y_1) - (x_2, y_2)$ que indican la ubicación exacta del espécimen dentro de la fotografía.
 
 ---
 

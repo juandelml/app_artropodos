@@ -16,7 +16,7 @@ Combinando técnicas de **Visión por Computadora** e **Inteligencia Artificial 
 
 * **Identificación Automática:** Localización espacial de artrópodos mediante cajas delimitadoras (*bounding boxes*) y predicción de orden biológico con porcentaje de confianza.
 * **Geolocalización GPS:** Registro de coordenadas exactas para cada observación en campo.
-* **Ficha Taxonómica Completa:** Información biológica estructurada (Reino, Filo, Clase, Orden, Familia y Género).
+* **Clasificación por Orden Biológico:** Identificación taxonómica a nivel de orden (*Araneae*, *Coleoptera*, *Diptera*, *Hemiptera*, *Hymenoptera*, *Lepidoptera*, *Odonata*) con porcentaje de certeza.
 * **Visor Interactivo en Pantalla Completa:** Inspección en alta resolución con zoom por pellizco o doble toque.
 * **Mapa de Avistamientos Comunitario:** Exploración cartográfica interactiva con agrupación de marcadores (*clusters*).
 * **Gestión por Roles:** Perfiles diferenciados entre **Observadores** (gestión de capturas personales) y **Administradores** (supervisión global y moderación).
